@@ -442,6 +442,9 @@ export const user_role_values = {
     },
 };
 
+export const provisional_new_member = 401;
+export const provisional_full_member = 402;
+
 export const all_org_type_values = {
     // When org_type was added to the database model, 'unspecified'
     // was the default for existing organizations. To discourage

@@ -390,3 +390,32 @@ function process_emoji_only_message(content: DocumentFragment): void {
     // the emoji in CSS.
     content.firstElementChild?.classList.add("emoji-only");
 }
+
+// Process user mentions in message content was expensive call,
+// we can process only relative part here.
+export function process_user_mention(message_content: string, user_id: number): boolean {
+    const search_attr = `data-user-id="${user_id}"`;
+    let index = message_content.indexOf(search_attr);
+
+    while (index !== -1) {
+        const sub_string = message_content.slice(Math.max(0, index - 200), index);
+        const class_pos = sub_string.lastIndexOf('class="');
+
+        if (class_pos !== -1) {
+            const after_class = sub_string.slice(class_pos + 7);
+            const class_end = after_class.indexOf('"');
+
+            if (class_end !== -1) {
+                const class_string = after_class.slice(0, class_end);
+                const classes = new Set(class_string.split(/\s+/));
+
+                if (classes.has("user-mention") && !classes.has("silent")) {
+                    return true;
+                }
+            }
+        }
+
+        index = message_content.indexOf(search_attr, index + 1);
+    }
+    return false;
+}
